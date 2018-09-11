@@ -1,2 +1,70 @@
+from tabu_search import TabuSearch
+from airplane import Airplane
+from random import shuffle
+from datetime import datetime
+import json
+
+
+def log(message, end=None):
+    print(message, flush=True, end=end)
+
+# number of planes (p), freeze time
+# for each plane i (i=1,...,p):
+#    appearance time, earliest landing time, target landing time,
+#    latest landing time, penalty cost per unit of time for landing
+#    before target, penalty cost per unit of time for landing
+#    after target
+#    for each plane j (j=1,...p): separation time required after
+#                                 i lands before j can land
+
+
 if __name__ == '__main__':
-    pass
+    datasets = [
+        {"name": "airland1.txt", "results": {}},
+        {"name": "airland2.txt", "results": {}},
+        {"name": "airland3.txt", "results": {}},
+        {"name": "airland4.txt", "results": {}},
+        {"name": "airland5.txt", "results": {}},
+    ]
+
+    # Loop through each data set.
+    for dataset in datasets:
+        # Read the data into memory
+        with open('datasets/{}'.format(dataset["name"]), 'r') as file:
+            line = file.readline().split()
+            num_planes, freeze_time = int(line[0]), int(line[1])
+            planes = []
+            for _ in range(num_planes):
+                params = file.readline().split()
+                params = [int(x) for x in params[:-2]] + [float(params[-2]), float(params[-1])]
+                separation_times = [int(x) for x in file.readline().split()]
+                arrival_time, earliest_time, target_time, latest_time, early_penalty, late_penalty = params
+                planes.append(Airplane(arrival_time, earliest_time, target_time, latest_time, separation_times, early_penalty, late_penalty))
+            log("\n\nDATASET {}: num_planes {} freeze_time {} items_read {}".format(dataset["name"], num_planes, freeze_time, len(planes)))
+        log("  Iteration", end=" ")
+        planes = sorted(planes, key=lambda p: p.arrival_time)
+        planes = sorted(planes, key=lambda p: p.earliest_time)
+        planes = sorted(planes, key=lambda p: p.latest_time)
+        # Perform 30 independent iterations.
+        for iteration in range(30):
+            log(iteration+1, end=" ")
+    #         thing = TabuSearch(capacity, items)
+    #
+    #         start_time = datetime.now()
+    #         total_iterations, stagnation, combination = thing.run()
+    #         execution_time = datetime.now() - start_time
+    #
+    #         # Record the relevant data for analysis
+    #         summary = {
+    #             "execution_time": str(execution_time),
+    #             "num_bins": len(thing.bins),
+    #             "fitness": sum(b.fitness() for b in thing.bins) / len(thing.bins),
+    #             "iterations": total_iterations,
+    #             "stagnation": stagnation,
+    #             "combination": combination,
+    #             "tabu_list": list(thing.tabu_list)
+    #         }
+    #         dataset["results"].setdefault("TabuSearch", []).append(summary)
+    # # Write the captured data to disk.
+    # with open("results_tabu_search.json", "w") as file:
+    #     file.write(json.dumps(datasets, indent=2))

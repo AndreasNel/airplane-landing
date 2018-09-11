@@ -1,5 +1,6 @@
 class Airplane:
-    def __init__(self, early, target, last, separation, early_penalty, late_penalty):
+    def __init__(self, arrival, early, target, last, separation, early_penalty, late_penalty):
+        self.arrival_time = arrival
         self.earliest_time = early
         self.target_time = target
         self.latest_time = last

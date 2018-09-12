@@ -1,6 +1,6 @@
 import random
 
-
+# TODO remove the randomness, rather go to average
 def move_to_target(airplane):
     """
     Moves the landing time of the airplane closer to its target landing time.

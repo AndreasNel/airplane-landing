@@ -1,6 +1,7 @@
 from airplane import Airplane
 import heuristics
 import move_operators
+import copy
 import random
 
 
@@ -9,16 +10,13 @@ class TabuSearch:
     MAX_ITERATIONS = 5000
     MAX_NO_CHANGE = 1000
 
-    def __init__(self, capacity, items):
+    def __init__(self, planes):
         """
         Creates an instance that can run the tabu search algorithm.
-        :param capacity: The capacity of a bin.
-        :param items: The items that have to be packed in bins.
+        :param planes: The initial solution to the problem.
         """
-        self.bin_capacity = capacity
-        self.items = items
+        self.planes = planes
         self.fitness = 0
-        self.bins = [Bin(capacity)]
         self.tabu_list = set()
 
     def run(self):
@@ -26,10 +24,10 @@ class TabuSearch:
         Runs the tabu search algorithm and returns the results at the end of the process.
         :return: (num_iterations, num_no_changes, chosen_combination)
         """
+        # TODO generate a new base combination each time the solution is improved
         combination = "".join(
             [random.choice(list(heuristics.HEURISTIC_MAP.keys())) for _ in range(random.randrange(self.MAX_COMBINATION_LENGTH) or 1)])
-        self.bins = self.generate_solution(combination)
-        self.fitness = sum(b.fitness() for b in self.bins) / len(self.bins)
+        self.fitness = sum(p.fitness() for p in self.planes)
         self.tabu_list.add(combination)
         current_iteration = 0
         num_no_change = 0
@@ -38,9 +36,9 @@ class TabuSearch:
             if new_combination not in self.tabu_list:
                 self.tabu_list.add(new_combination)
                 solution = self.generate_solution(new_combination)
-                fitness = sum(b.fitness() for b in solution) / len(solution)
+                fitness = sum(p.fitness() for p in solution)
                 if fitness > self.fitness:
-                    self.bins = solution
+                    self.planes = solution
                     self.fitness = fitness
                     num_no_change = 0
                     combination = new_combination
@@ -54,12 +52,17 @@ class TabuSearch:
         :param pattern: A pattern indicating the order in which heuristics need to be applied to get the solution.
         :return: A list of bins to serve as a solution.
         """
-        solution = [Bin(self.bin_capacity)]
+        solution = copy.deepcopy(self.planes)
         pattern_length = len(pattern)
-        for idx, item in enumerate(self.items):
+        for idx, plane in enumerate(solution):
             h = pattern[idx % pattern_length]
-            solution = heuristics.HEURISTIC_MAP[h].apply(item, solution)
-        return solution
+            original_landing_time = plane.landing_time
+            try:
+                heuristics.HEURISTIC_MAP[h](plane, solution)
+            #     TODO sort the solution and determine whether it is valid
+            except:
+                plane.landing_time = original_landing_time
+        return sorted(solution, key=lambda p: p.landing_time)
 
     def apply_move_operator(self, pattern):
         """

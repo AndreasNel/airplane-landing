@@ -3,6 +3,7 @@ from airplane import Airplane
 from random import shuffle
 from datetime import datetime
 import json
+from operator import attrgetter
 
 
 def log(message, end=None):
@@ -34,37 +35,35 @@ if __name__ == '__main__':
             line = file.readline().split()
             num_planes, freeze_time = int(line[0]), int(line[1])
             planes = []
-            for _ in range(num_planes):
+            for idx in range(num_planes):
                 params = file.readline().split()
                 params = [int(x) for x in params[:-2]] + [float(params[-2]), float(params[-1])]
                 separation_times = [int(x) for x in file.readline().split()]
                 arrival_time, earliest_time, target_time, latest_time, early_penalty, late_penalty = params
-                planes.append(Airplane(arrival_time, earliest_time, target_time, latest_time, separation_times, early_penalty, late_penalty))
+                planes.append(Airplane(idx, arrival_time, earliest_time, target_time, latest_time, separation_times, early_penalty, late_penalty))
             log("\n\nDATASET {}: num_planes {} freeze_time {} items_read {}".format(dataset["name"], num_planes, freeze_time, len(planes)))
+        planes = sorted(planes, key=attrgetter('arrival_time', 'earliest_time', 'latest_time'))
+        for idx, p in enumerate(planes):
+            log((p.plane_id, p.arrival_time, p.earliest_time, p.latest_time))
         log("  Iteration", end=" ")
-        planes = sorted(planes, key=lambda p: p.arrival_time)
-        planes = sorted(planes, key=lambda p: p.earliest_time)
-        planes = sorted(planes, key=lambda p: p.latest_time)
         # Perform 30 independent iterations.
-        for iteration in range(30):
+        for iteration in range(1):
             log(iteration+1, end=" ")
-    #         thing = TabuSearch(capacity, items)
-    #
-    #         start_time = datetime.now()
-    #         total_iterations, stagnation, combination = thing.run()
-    #         execution_time = datetime.now() - start_time
-    #
-    #         # Record the relevant data for analysis
-    #         summary = {
-    #             "execution_time": str(execution_time),
-    #             "num_bins": len(thing.bins),
-    #             "fitness": sum(b.fitness() for b in thing.bins) / len(thing.bins),
-    #             "iterations": total_iterations,
-    #             "stagnation": stagnation,
-    #             "combination": combination,
-    #             "tabu_list": list(thing.tabu_list)
-    #         }
-    #         dataset["results"].setdefault("TabuSearch", []).append(summary)
-    # # Write the captured data to disk.
-    # with open("results_tabu_search.json", "w") as file:
-    #     file.write(json.dumps(datasets, indent=2))
+            thing = TabuSearch(planes)
+
+            start_time = datetime.now()
+            total_iterations, stagnation, combination = thing.run()
+            execution_time = datetime.now() - start_time
+
+            # Record the relevant data for analysis
+            summary = {
+                "execution_time": str(execution_time),
+                "fitness": thing.fitness,
+                "iterations": total_iterations,
+                "stagnation": stagnation,
+                "combination": combination,
+            }
+            dataset["results"].setdefault("TabuSearch", []).append(summary)
+    # Write the captured data to disk.
+    with open("results_tabu_search.json", "w") as file:
+        file.write(json.dumps(datasets, indent=2))

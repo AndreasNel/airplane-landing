@@ -1,6 +1,6 @@
 from tabu_search import TabuSearch
 from airplane import Airplane
-from random import shuffle
+import copy
 from datetime import datetime
 import json
 from operator import attrgetter
@@ -44,13 +44,14 @@ if __name__ == '__main__':
             log("\n\nDATASET {}: num_planes {} freeze_time {} items_read {}".format(dataset["name"], num_planes, freeze_time, len(planes)))
         planes = sorted(planes, key=attrgetter('arrival_time', 'earliest_time', 'latest_time'))
         for idx, p in enumerate(planes):
-            log((p.plane_id, p.arrival_time, p.earliest_time, p.latest_time))
+            log((p.plane_id, p.arrival_time, p.earliest_time, p.target_time, p.latest_time))
         log("  Iteration", end=" ")
         # Perform 30 independent iterations.
-        for iteration in range(1):
+        for iteration in range(30):
             log(iteration+1, end=" ")
-            thing = TabuSearch(planes)
+            thing = TabuSearch(copy.deepcopy(planes))
 
+            initial_fitness = thing.fitness
             start_time = datetime.now()
             total_iterations, stagnation, combination = thing.run()
             execution_time = datetime.now() - start_time
@@ -58,12 +59,14 @@ if __name__ == '__main__':
             # Record the relevant data for analysis
             summary = {
                 "execution_time": str(execution_time),
+                "initial_fitness": initial_fitness,
                 "fitness": thing.fitness,
                 "iterations": total_iterations,
                 "stagnation": stagnation,
                 "combination": combination,
+                "landing_times": ["{}: {}".format(p.plane_id, p.landing_time) for p in planes],
             }
             dataset["results"].setdefault("TabuSearch", []).append(summary)
-    # Write the captured data to disk.
-    with open("results_tabu_search.json", "w") as file:
-        file.write(json.dumps(datasets, indent=2))
+            # Write the captured data to disk.
+            with open("results_tabu_search.json", "w") as file:
+                file.write(json.dumps(datasets, indent=2))

@@ -3,7 +3,7 @@ import random
 
 def remove(items, choices):
     """
-    Removes one or more of the items from the items list. Guarantees that there will always be at least one item
+    Removes an items from the items list. Guarantees that there will always be at least one item
     left in the list of items.
     :param items: The items to which the operator should be applied.
     :param choices: Items that the operator can inject into the items if necessary.
@@ -17,7 +17,7 @@ def remove(items, choices):
 
 def add(items, choices):
     """
-    Adds one or more randomly picked items from the choices list to the list of items.
+    Adds one randomly picked item from the choices list to the list of items.
     :param items: The items to which the operator should be applied.
     :param choices: Items that the operator can inject into the items if necessary.
     :return: The list of items after the operator was applied.
@@ -29,7 +29,7 @@ def add(items, choices):
 
 def change(items, choices):
     """
-    Changes one or more of the items in the item list to a randomly picked item in the choices list.
+    Changes one of the items in the item list to a randomly picked item in the choices list.
     :param items: The items to which the operator should be applied.
     :param choices: Items that the operator can inject into the items if necessary.
     :return: The list of items after the operator was applied.
@@ -42,7 +42,7 @@ def change(items, choices):
 
 def swap(items, choices):
     """
-    Swaps one or more of the items with another one in the item list.
+    Swaps one of the items with another one in the item list.
     :param items: The items to which the operator should be applied.
     :param choices: Items that the operator can inject into the items if necessary.
     :return: The list of items after the operator was applied.

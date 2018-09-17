@@ -50,6 +50,10 @@ class TabuSearch:
         return current_iteration, num_no_change, combination
 
     def generate_combination(self):
+        """
+        Generates a random new heuristic combination.
+        :return: A string representing the heuristic combination.
+        """
         return "".join(
             [random.choice(list(heuristics.HEURISTIC_MAP.keys())) for _ in
              range(random.randrange(self.MIN_COMBINATION_LENGTH, self.MAX_COMBINATION_LENGTH))])

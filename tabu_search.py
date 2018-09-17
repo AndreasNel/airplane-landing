@@ -1,4 +1,3 @@
-from airplane import Airplane
 import heuristics
 import move_operators
 import copy
@@ -7,8 +6,9 @@ import random
 
 class TabuSearch:
     MAX_COMBINATION_LENGTH = 10
-    MAX_ITERATIONS = 5000
-    MAX_NO_CHANGE = 5000
+    MIN_COMBINATION_LENGTH = 5
+    MAX_ITERATIONS = 10000
+    MAX_NO_CHANGE = 1000
 
     def __init__(self, planes):
         """
@@ -17,7 +17,10 @@ class TabuSearch:
         """
         self.planes = planes
         for idx in range(1, len(planes)):
-            self.planes[idx].landing_time = max(random.randint(self.planes[idx].earliest_time, self.planes[idx].latest_time), self.planes[idx - 1].next_available_time(self.planes[idx].plane_id))
+            self.planes[idx].landing_time = max(
+                random.randint(self.planes[idx].earliest_time, self.planes[idx].latest_time),
+                self.planes[idx - 1].next_available_time(self.planes[idx].plane_id)
+            )
         self.fitness = sum(p.fitness() for p in self.planes)
         self.tabu_list = set()
 
@@ -37,7 +40,7 @@ class TabuSearch:
                 self.tabu_list.add(new_combination)
                 solution = self.generate_solution(new_combination)
                 fitness = sum(p.fitness() for p in solution)
-                if fitness < self.fitness:
+                if fitness <= self.fitness:
                     self.planes = solution
                     self.fitness = fitness
                     num_no_change = 0
@@ -49,7 +52,7 @@ class TabuSearch:
     def generate_combination(self):
         return "".join(
             [random.choice(list(heuristics.HEURISTIC_MAP.keys())) for _ in
-             range(random.randrange(self.MAX_COMBINATION_LENGTH) or 1)])
+             range(random.randrange(self.MIN_COMBINATION_LENGTH, self.MAX_COMBINATION_LENGTH))])
 
     def generate_solution(self, pattern):
         """

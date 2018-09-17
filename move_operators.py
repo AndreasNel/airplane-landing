@@ -9,8 +9,7 @@ def remove(items, choices):
     :param choices: Items that the operator can inject into the items if necessary.
     :return: The list of items after the operator was applied.
     """
-    num_removals = random.randrange(len(items))
-    for _ in range(num_removals):
+    if len(items) > 1:
         to_remove = random.randrange(len(items))
         items = items[:to_remove] + items[to_remove + 1:]
     return items
@@ -23,10 +22,8 @@ def add(items, choices):
     :param choices: Items that the operator can inject into the items if necessary.
     :return: The list of items after the operator was applied.
     """
-    num_inserts = random.randrange(len(items) + 1)
-    for _ in range(num_inserts):
-        to_insert = random.randrange(len(items))
-        items = items[:to_insert] + random.choice(choices) + items[to_insert:]
+    to_insert = random.randrange(len(items))
+    items = items[:to_insert] + random.choice(choices) + items[to_insert:]
     return items
 
 
@@ -37,11 +34,9 @@ def change(items, choices):
     :param choices: Items that the operator can inject into the items if necessary.
     :return: The list of items after the operator was applied.
     """
-    num_changes = random.randrange(len(items)+1)
     items = list(items)
-    for _ in range(num_changes):
-        to_change = random.randrange(len(items))
-        items[to_change] = random.choice(choices)
+    to_change = random.randrange(len(items))
+    items[to_change] = random.choice(choices)
     return "".join(items)
 
 
@@ -52,11 +47,9 @@ def swap(items, choices):
     :param choices: Items that the operator can inject into the items if necessary.
     :return: The list of items after the operator was applied.
     """
-    num_swaps = random.randrange(len(items))
     items = list(items)
-    for _ in range(num_swaps):
-        idx1, idx2 = random.randrange(len(items)), random.randrange(len(items))
-        items[idx1], items[idx2] = items[idx2], items[idx1]
+    idx1, idx2 = random.randrange(len(items)), random.randrange(len(items))
+    items[idx1], items[idx2] = items[idx2], items[idx1]
     return "".join(items)
 
 

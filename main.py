@@ -9,15 +9,6 @@ from operator import attrgetter
 def log(message, end=None):
     print(message, flush=True, end=end)
 
-# number of planes (p), freeze time
-# for each plane i (i=1,...,p):
-#    appearance time, earliest landing time, target landing time,
-#    latest landing time, penalty cost per unit of time for landing
-#    before target, penalty cost per unit of time for landing
-#    after target
-#    for each plane j (j=1,...p): separation time required after
-#                                 i lands before j can land
-
 
 if __name__ == '__main__':
     datasets = [
@@ -64,7 +55,7 @@ if __name__ == '__main__':
                 "iterations": total_iterations,
                 "stagnation": stagnation,
                 "combination": combination,
-                "landing_times": ["{}: {}".format(p.plane_id, p.landing_time) for p in planes],
+                "landing_times": ["{}: {}".format(p.plane_id, p.landing_time) for p in thing.planes],
             }
             dataset["results"].setdefault("TabuSearch", []).append(summary)
             # Write the captured data to disk.
